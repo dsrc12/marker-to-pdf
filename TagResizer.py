@@ -1,10 +1,12 @@
 import pygame, os
+from pathlib import Path
 from fpdf import FPDF
-# Requires pygame and fpdf
+# Requires pygame, pathlib and fpdf
+# For page drawing, path compatibility on different systems, and pdf generation, respectively
 pygame.init()
 
 # paths for the tag images and font used
-tagpath = "Tags\\tag36_11_" # Filename may have to be changed if tags replaced to different spec
+loadtagpath = str(Path("Tags") / "tag36_11_") # Filename may have to be changed if tags replaced to different spec
 fontpath = "OpenSans-Regular.ttf" # Nice opensource font... also used by SR
 
 # Dictionary of the dimensions of the different print formats, in mm
@@ -33,7 +35,8 @@ while True:
     if preset not in list(presets.keys()):
         # Takes custom values for those in each value of presets above
         mmscale = int(input("Scale (Pixels per mm)\n>> "))  # Higher number basically means higher resolution
-        papertype = input("Paper type\nOne from: %s\n>> " % ", ".join(list(papertypes.keys()))).upper() # Case insensitive
+        # Paper type input (case insensitive)
+        papertype = input("Paper type\nOne from: %s\n>> " % ", ".join(list(papertypes.keys()))).upper()
         dims = papertypes[papertype]
         # The width and height of the page in pixels
         w = dims[0] * mmscale
@@ -98,7 +101,7 @@ while True:
                 # Doesn't increment i, so the first of the range is printed in the next pass of the loop
             else:
                 # Adds the correct tag, scaled to the right size, to the list
-                tags.append(pygame.transform.scale(pygame.image.load_extended(tagpath + "%05d.png" % (int(tagno))),
+                tags.append(pygame.transform.scale(pygame.image.load_extended(loadtagpath + ("%05d.png" % (int(tagno)))),
                                                    (tagedge, tagedge)))
                 i += 1
         
@@ -109,10 +112,12 @@ while True:
         btm = int((h + tagedge)/2)
         
         # Increments set counter until it finds an unused set, then makes said folder
-        while os.path.exists("Set%03d\\" % pageset):
+        while os.path.exists("Set%03d" % pageset):
             pageset += 1
-        print("Tags will be saved as Set%03d" % pageset)
-        os.makedirs("Set%03d\\" % pageset, exist_ok=True)
+        # Path for the folder in which the printed pngs and pdf are saved
+        setpath = "Set%03d" % pageset
+        print("Tags will be saved as %s" % setpath)
+        os.makedirs(setpath, exist_ok=True)
         
         # Prints tag pages to png files
         for i in range(len(tags)):
@@ -131,14 +136,15 @@ while True:
                 number = textfont.render("- %s -" % tagnos[i], 0, (0,0,0))
                 page.blit(number, ((w - number.get_width())/2, btm))
             # Saves the page as a png
-            pygame.image.save(page, "Set%03d\\%s(Tag%s).png" % (pageset, i, tagnos[i]))
+            savetagpath = str(Path(setpath) / ("%s(Tag%s).png" % (i, tagnos[i])))
+            pygame.image.save(page, savetagpath)
             print("%s - Saved Tag %s" % (i, tagnos[i]))
             # Adds the page to the pdf (except for squares)
             if papertype != "SQUARE":
                 pdf.add_page() # Adds page
-                pdf.image("Set%03d\\%s(Tag%s).png" % (pageset, i, tagnos[i]), 0, 0, dims[0], dims[1]) # Prints image on it
+                pdf.image(savetagpath, 0, 0, dims[0], dims[1]) # Prints image on it
         # And saves the pdf (if one has been created)
         if papertype != "SQUARE":
-            pdf.output("Set%03d\\Tags.pdf" % pageset, "F")
+            pdf.output(str(Path(setpath) / "Tags.pdf"), "F")
             print("Saved pdf\n")
         pageset += 1
