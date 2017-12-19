@@ -1,5 +1,3 @@
-# D:\Users\Charles Turvey\Documents\SourceBots\AprilTags\MarkerMaker\Test.csv
-
 import pygame, os
 from pathlib import Path
 from fpdf import FPDF
