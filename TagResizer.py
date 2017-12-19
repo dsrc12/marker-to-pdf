@@ -22,21 +22,26 @@ papertypes = {"A4": (297, 210), "A3": (420, 297), "SQUARE": (100, 100)}
 presets = {"LARGE": ["A3 page with 25cm marker", 5, "A3", 25],
            "SMALL": ["A4 page with 10cm marker", 5, "A4", 10],
            "SQUARE": ["Just markers (does not produce PDF)", 5, "SQUARE", 10]}
+presetnames = list(presets.keys())
 
 # Each set of marker images printed (and the document collating them) go in a numbered folder designated by this number
 pageset = 0
+# Instructions for preset input
+presettext = "Select preset from list below:\n{}\nCUSTOM - Select the parameters separately\n>> "
+presettext = presettext.format("\n".join(["{} - {}".format(i, presets[i][0]) for i in presetnames]))
+# Instructions for paper type input
+papertypetext = "Paper type\nOne from: {}\n>> ".format(", ".join(list(papertypes.keys())))
 
 while True:
     # Shows the list of presets for selection and takes a choice (case insensitive) for input
-    preset = input("Select preset from list below:\n%s\nCUSTOM - Select the parameters separately\n>> " %
-                   "\n".join(["%s - %s" % (i, presets[i][0]) for i in list(presets.keys())])).upper()
+    preset = input(presettext).upper()
     
     # Anything not in the list is interpreted as "CUSTOM"
     if preset not in list(presets.keys()):
         # Takes custom values for those in each value of presets above
         mmscale = int(input("Scale (Pixels per mm)\n>> "))  # Higher number basically means higher resolution
         # Paper type input (case insensitive)
-        papertype = input("Paper type\nOne from: %s\n>> " % ", ".join(list(papertypes.keys()))).upper()
+        papertype = input(papertypetext).upper()
         dims = papertypes[papertype]
         # The width and height of the page in pixels
         w = dims[0] * mmscale
@@ -101,7 +106,8 @@ while True:
                 # Doesn't increment i, so the first of the range is printed in the next pass of the loop
             else:
                 # Adds the correct tag, scaled to the right size, to the list
-                tags.append(pygame.transform.scale(pygame.image.load_extended(loadtagpath + ("%05d.png" % (int(tagno)))),
+                tags.append(pygame.transform.scale(pygame.image.load_extended(loadtagpath +
+                                                                              ("{:05d}.png".format(int(tagno)))),
                                                    (tagedge, tagedge)))
                 i += 1
         
@@ -112,11 +118,11 @@ while True:
         btm = int((h + tagedge)/2)
         
         # Increments set counter until it finds an unused set, then makes said folder
-        while os.path.exists("Set%03d" % pageset):
+        while os.path.exists("Set{:03d}".format(pageset)):
             pageset += 1
         # Path for the folder in which the printed pngs and pdf are saved
-        setpath = "Set%03d" % pageset
-        print("Tags will be saved as %s" % setpath)
+        setpath = "Set{:03d}".format(pageset)
+        print("Tags will be saved as {}".format(setpath))
         os.makedirs(setpath, exist_ok=True)
         
         # Prints tag pages to png files
@@ -133,12 +139,12 @@ while True:
                 pygame.draw.line(page, 0, (lft, btm), (rgt, btm))
             # Renders and inserts a number if possible
             if papertype != "SQUARE":
-                number = textfont.render("- %s -" % tagnos[i], 0, (0,0,0))
+                number = textfont.render("- {} -".format(tagnos[i]), 0, (0,0,0))
                 page.blit(number, ((w - number.get_width())/2, btm))
             # Saves the page as a png
-            savetagpath = str(Path(setpath) / ("%s(Tag%s).png" % (i, tagnos[i])))
+            savetagpath = str(Path(setpath) / ("{}(Tag{}).png".format(i, tagnos[i])))
             pygame.image.save(page, savetagpath)
-            print("%s - Saved Tag %s" % (i, tagnos[i]))
+            print("{} - Saved Tag {}".format(i, tagnos[i]))
             # Adds the page to the pdf (except for squares)
             if papertype != "SQUARE":
                 pdf.add_page() # Adds page
