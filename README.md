@@ -1,7 +1,6 @@
 # **marker-to-pdf**
-### **Overview**
-Script used to generate pdf documents, populated with April Tag markers, for quick printing.
-Contains:
+### **Overview of the files**
+This repo contains:
 * TagResizer.py
   * The python script which takes the markers in Tags and scales and prints them according to the required page size, tag size, resolution, etc. It can take CSV files or the required tags can be typed in as a comma-separated list (follow the instructions on the command-line).
 * PrintSomeTags.bat
@@ -14,7 +13,8 @@ Contains:
   * The MIT license for the code herein.
 * README.md
   * ...this document.
-### **The Script: Input**
+### **The Script: using TagResizer.py**
+TagResizer.py codes for a commandline interface which allows the user to print out markers of various sizes to an easily printable PDF or a series of PNG images for insertion into other media, where attempting to resize and format the original images from the AprilTags website could be time-consuming or irritating.
 As aforementioned, TagResizer.py can take CSV files or comma-separated input.
 CSV files should be formatted with the name of the tag in the first column (to be printed above the tag on the page), the tag's code in the second (to be printed below the tag on the page), and the tag's side length in cm (including the white border) in the third. Any headers or malformed rows will be omitted (visible in the terminal output).
 For example:
@@ -35,3 +35,29 @@ If the tag numbers are input manually on the command line, they are required in 
 1-5             # As would this
 1,1-3,5,8,1-10  # Would print tags 1, 1, 2, 3, 5, 8, 1, 2, 3, 4, 5, 6, 7, 8, 9 and 10. In that order.
 ```
+
+Manually input tag numbers do not give opportunity for printing tag names.
+
+TagResizer.py gives two forms of output: a series of PNG images of the printed pages, and a PDF document with them all collated for printing. (TODO: clarify this further?) The commandline interface gives options for the format of printing, permitting manual customisation or use of presets for standard marker formats.
+
+The available presets are:
+* LARGE
+  * Produces an A3 page with a 25cm x 25cm marker in the centre.
+* SMALL
+  * Produces an A4 page with a 10cm x 10cm marker in the centre.
+* SQUARE
+  * Produces a square page, entirely filled by the marker (including its white border).
+  * This preset will not produce a PDF.
+
+You can select:
+* Scale
+  * Essentially the clarity of the image. Takes a value for the number of pixels per mm the image is rendered with.
+  * The standard value is 5px per mm. This value is used in the presets and for CSV input, for simplicity.
+* Paper type
+  * One from A4, A3 or SQUARE.
+    * SQUARE format does not produce a pdf, only a series of marker PNGs with no number or label.
+* Tag size
+  * The side length of the tag printed, in cm.
+  * Tags are printed in the centre of the page, with the code underneath and name above, except in the case of the SQUARE page type, where they determine the size of the image.
+  * If you select a size of 0, no tag will be printed but a blank page will be inserted into the PDF or, if the SQUARE page type is selected, a PNG with nothing in it will be produced for that marker.
+ 
