@@ -49,13 +49,14 @@ The available presets are:
   * Produces a square page, entirely filled by the marker (including its white border).
   * This preset will not produce a PDF.
 
-You can select:
+In CUSTOM format creation, you can select:
 * Scale
   * Essentially the clarity of the image. Takes a value for the number of pixels per mm the image is rendered with.
   * The standard value is 5px per mm. This value is used in the presets and for CSV input, for simplicity.
 * Paper type
   * One from A4, A3 or SQUARE.
-    * SQUARE format does not produce a pdf, only a series of marker PNGs with no number or label.
+    * A4 and A3 formats produce series of PNG images and a PDF of all the markers on pages of their respective paper size, all with the marker in the centre, code underneath and name above.
+    * SQUARE format does not produce a PDF, only a series of marker PNGs with no number or label.
 * Tag size
   * The side length of the tag printed, in cm.
   * Tags are printed in the centre of the page, with the code underneath and name above, except in the case of the SQUARE page type, where they determine the size of the image.
